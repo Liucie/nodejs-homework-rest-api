@@ -1,22 +1,28 @@
 import { HttpCode } from '../../lib/constants'
-import AuthService from '../../services/auth'
+import authService from '../../services/auth'
+import { UploadFileService, LocalFileStorage } from '../../services/file-storage'
 
 
-const authService = new AuthService()
+// export const authService = new AuthService()
 
 const signup = async (req, res, next) =>{
+    try{
     const { email } = req.body
     const isUserExist = await authService.isUserExist(email)
     if(isUserExist) {
         return res.status(HttpCode.CONFLICT).json({
             status: 'error', 
             code: HttpCode.CONFLICT,
-            message: "Email in use"
+            message: "Email in use",
         })
     }
     const data = await authService.create(req.body)
-    res .status(HttpCode.OK).json({status: 'success', code: HttpCode.OK, data: data})
-
+    res
+    .status(HttpCode.CREATED)
+    .json({status: 'success', code: HttpCode.CREATED, data: data})
+    } catch (err) {
+        next(err)
+    }
 }
 
 const login = async (req, res, next) =>{
@@ -87,5 +93,20 @@ const updateUser = async(req,res,next) => {
 }
 }
 
+const uploadAvatar = async(req,res,next) => {
+    const uploadService = new UploadFileService(
+        LocalFileStorage,
+        req.file,
+        req.user
+    )
 
-export { signup, login, logout, current, updateUser }
+    const avatarUrl = await uploadService.updateAvatar()
+    
+    res
+    .status(HttpCode.OK)
+    .json({status:'success', code: HttpCode.OK, data:{ avatarUrl }})
+}
+
+
+
+export { signup, login, logout, current, updateUser, uploadAvatar }

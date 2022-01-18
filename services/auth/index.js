@@ -1,4 +1,3 @@
-// import User from "../../model/user"
 import jwt from "jsonwebtoken"
 import UsersRepository from "../../repository/users"
 const SECRET_KEY = process.env.JWT_SECRET_KEY
@@ -10,8 +9,8 @@ class AuthService {
     }
     
     async create(body){
-        const { id, email, subscription} = await UsersRepository.create(body)
-        return { id, email, subscription}
+        const { id, email, subscription, avatar} = await UsersRepository.create(body)
+        return { id, email, subscription, avatar}
     }
 
     async getUser(email, password) {
@@ -40,4 +39,4 @@ class AuthService {
     }
 }
 
-export default AuthService
+export default new AuthService() 
