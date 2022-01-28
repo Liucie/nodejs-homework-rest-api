@@ -9,14 +9,14 @@ class AuthService {
     }
     
     async create(body){
-        const { id, email, subscription, avatar} = await UsersRepository.create(body)
-        return { id, email, subscription, avatar}
+        const { id, email, subscription, avatar, verificationToken} = await UsersRepository.create(body)
+        return { id, email, subscription, avatar, verificationToken}
     }
 
     async getUser(email, password) {
         const user = await UsersRepository.findByEmail(email)
         const isValidPassword = await user?.isValidPassword(password)
-        if(!isValidPassword){
+        if(!isValidPassword || !user?.verify){
             return null
         }
         return user
